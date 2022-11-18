@@ -30,9 +30,9 @@ namespace TinyCompiler
         }
         void PrintTokens()
         {
-            for (int i = 0; i < Tiny_PL_compiler.Jason_Scanner.Tokens.Count; i++)
+            for (int i = 0; i < Tiny_PL_compiler.Tiny_Scanner.Tokens.Count; i++)
             {
-               dataGridView1.Rows.Add(Tiny_PL_compiler.Jason_Scanner.Tokens.ElementAt(i).lex, Tiny_PL_compiler.Jason_Scanner.Tokens.ElementAt(i).token_type);
+               dataGridView1.Rows.Add(Tiny_PL_compiler.Tiny_Scanner.Tokens.ElementAt(i).lex, Tiny_PL_compiler.Tiny_Scanner.Tokens.ElementAt(i).token_type);
             }
         }
 

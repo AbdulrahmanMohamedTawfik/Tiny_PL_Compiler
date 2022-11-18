@@ -8,7 +8,7 @@ namespace TinyCompiler
 {
     public static class Tiny_PL_compiler
     {
-        public static Scanner Jason_Scanner = new Scanner();
+        public static Scanner Tiny_Scanner = new Scanner();
        
         public static List<string> Lexemes= new List<string>();
         public static List<Token> TokenStream = new List<Token>();
@@ -18,7 +18,7 @@ namespace TinyCompiler
         {
             //Scanner
  
-            Jason_Scanner.StartScanning(SourceCode);
+            Tiny_Scanner.StartScanning(SourceCode);
             //Parser
             //Sematic Analysis
         } 
