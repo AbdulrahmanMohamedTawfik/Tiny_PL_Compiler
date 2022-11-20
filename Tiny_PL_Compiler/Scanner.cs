@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 public enum Token_Class
 {
-    Int, Float, String, Read, Write, Repeat, Until, If, Elseif, Else, Then, Return,
-    Endl, Parameters, Semicolon, Comma, LParanthesis, RParanthesis, Lbrace, Rbrace, EqualOp, LessThanOp,
+    Int, Float, String, Read, Write, Repeat, Until, If, Elseif, Else, Then, End, Return,
+    Endl, Parameters, Semicolon, Comma, LParanthesis, RParanthesis, Lbrace, Rbrace, IsEqualOp, EqualOp, LessThanOp,
     GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp,OrOp, Idenifier, Constant
 }
 namespace TinyCompiler
@@ -39,6 +39,7 @@ namespace TinyCompiler
             ReservedWords.Add("else", Token_Class.Else);
             ReservedWords.Add("elseif", Token_Class.Elseif);
             ReservedWords.Add("then", Token_Class.Then);
+            ReservedWords.Add("end", Token_Class.End);
             ReservedWords.Add("return", Token_Class.Return);
             ReservedWords.Add("endl", Token_Class.Endl);
             ReservedWords.Add("parameters", Token_Class.Parameters);
@@ -49,7 +50,8 @@ namespace TinyCompiler
             Operators.Add(")", Token_Class.RParanthesis);
             Operators.Add("{", Token_Class.Lbrace);
             Operators.Add("}", Token_Class.Rbrace);
-            Operators.Add("=", Token_Class.EqualOp);
+            Operators.Add("=", Token_Class.IsEqualOp);
+            Operators.Add(":=", Token_Class.EqualOp);
             Operators.Add("<", Token_Class.LessThanOp);
             Operators.Add(">", Token_Class.GreaterThanOp);
             Operators.Add("<>", Token_Class.NotEqualOp);
