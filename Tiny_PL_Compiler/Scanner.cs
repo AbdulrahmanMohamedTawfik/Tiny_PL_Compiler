@@ -83,16 +83,12 @@ namespace TinyCompiler
 
                         while ((CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar >= '0' && CurrentChar <= '9')
                         {
-
                             CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
-
                             j++;
                             CurrentChar = SourceCode[j];
-
                         }
                     }
                     FindTokenClass(CurrentLexeme);
-
                     i = j - 1;
                 }
 
@@ -109,8 +105,8 @@ namespace TinyCompiler
                         j++;
                         if (j < SourceCode.Length)
                             CurrentChar = SourceCode[j];
-
                     }
+
                     FindTokenClass(CurrentLexeme);
                     i = j - 1;
                 }
