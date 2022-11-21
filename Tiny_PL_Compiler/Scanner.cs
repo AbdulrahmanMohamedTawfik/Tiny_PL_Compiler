@@ -8,7 +8,7 @@ public enum Token_Class
 {
     Int, Float, String, Read, Write, Repeat, Until, If, Elseif, Else, Then, End, Return,
     Endl, Parameters, Semicolon, Comma, LParanthesis, RParanthesis, Lbrace, Rbrace, IsEqualOp, EqualOp, LessThanOp,
-    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp,OrOp, Idenifier, Constant
+    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp, Idenifier, Constant
 }
 namespace TinyCompiler
 {
@@ -110,17 +110,17 @@ namespace TinyCompiler
                     FindTokenClass(CurrentLexeme);
                     i = j - 1;
                 }
-                else if (CurrentChar == '{')
-                {
-                    j++;
-                    CurrentChar = SourceCode[j];
-                    while (CurrentChar != '}')
-                    {
-                        j++;
-                        CurrentChar = SourceCode[j];
-                    }
-                    i = j;
-                }
+                //else if (CurrentChar == '{')
+                //{
+                //    j++;
+                //    CurrentChar = SourceCode[j];
+                //    while (CurrentChar != '}')
+                //    {
+                //        j++;
+                //        CurrentChar = SourceCode[j];
+                //    }
+                //    i = j;
+                //}
                 else
                 {
                     FindTokenClass(CurrentLexeme);
