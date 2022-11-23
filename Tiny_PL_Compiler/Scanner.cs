@@ -70,11 +70,49 @@ namespace TinyCompiler
                 int j = i;
                 char CurrentChar = SourceCode[i];
                 string CurrentLexeme = CurrentChar.ToString();
-
+                //لو لاقيت مسافة او سطر جديد
                 if (CurrentChar == ' ' || CurrentChar == '\r' || CurrentChar == '\n')
                     continue;
 
-                if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
+                //لو لاقيت كومنت
+                else if (CurrentChar == '/')//لو لاقيت سلاش
+                {
+                    bool is_comment = false;
+                    //امشي خطوة
+                    j++;
+                    CurrentChar = SourceCode[j];
+
+                    if (CurrentChar == '*')//لو لاقيت نجمة
+                    {
+                        //امشي خطوة تاني
+                        j++;
+                        CurrentChar = SourceCode[j];
+                        while (true)
+                        {
+                            if (CurrentChar == '*')//لو لاقيت نجمة
+                            {
+                                //امشي خطوة
+                                j++;
+                                CurrentChar = SourceCode[j];
+                                if (CurrentChar == '/')//لو لاقيت سلاش
+                                {
+                                    is_comment = true;//يبقي ده كومنت
+                                    break;
+                                }
+                            }
+                            //امشي خطوة
+                            j++;
+                            CurrentChar = SourceCode[j];
+                        }
+                    }
+                    if (is_comment)
+                    {
+                        i = j;
+                    }
+                }
+
+                //لو لاقيت كلمة من حرف او اكتر
+                else if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
                 {
                     j = i + 1;
                     if (j < SourceCode.Length)
@@ -92,6 +130,7 @@ namespace TinyCompiler
                     i = j - 1;
                 }
 
+                //لو لاقيت رقم من خانة واحدة او اكتر
                 else if (CurrentChar >= '0' && CurrentChar <= '9')
                 {
                     j = i + 1;
@@ -110,17 +149,7 @@ namespace TinyCompiler
                     FindTokenClass(CurrentLexeme);
                     i = j - 1;
                 }
-                //else if (CurrentChar == '{')
-                //{
-                //    j++;
-                //    CurrentChar = SourceCode[j];
-                //    while (CurrentChar != '}')
-                //    {
-                //        j++;
-                //        CurrentChar = SourceCode[j];
-                //    }
-                //    i = j;
-                //}
+
                 else
                 {
                     FindTokenClass(CurrentLexeme);
@@ -164,6 +193,7 @@ namespace TinyCompiler
                 Tokens.Add(Tok);
             }
             //Is it an operator?
+            //Is it an assign operator? (:=)
 
             else
             {

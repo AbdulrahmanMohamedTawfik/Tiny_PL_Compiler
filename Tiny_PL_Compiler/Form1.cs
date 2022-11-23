@@ -19,7 +19,7 @@ namespace TinyCompiler
 
         private void button1_Click(object sender, EventArgs e)
         {
-            textBox2.Clear();
+            ErrorListTextBox.Clear();
             //string Code=textBox1.Text.ToLower();
             string Code = textBox1.Text;
             Tiny_PL_compiler.Start_Compiling(Code);
@@ -40,8 +40,8 @@ namespace TinyCompiler
         {
             for(int i=0; i<Errors.Error_List.Count; i++)
             {
-                textBox2.Text += Errors.Error_List[i];
-                textBox2.Text += "\r\n";
+                ErrorListTextBox.Text += Errors.Error_List[i];
+                ErrorListTextBox.Text += "\r\n";
             }
         }
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -57,6 +57,7 @@ namespace TinyCompiler
         private void button2_Click(object sender, EventArgs e)
         {
             dataGridView1.Rows.Clear();
+            ErrorListTextBox.Clear();
             Tiny_PL_compiler.TokenStream.Clear();
         }
 
