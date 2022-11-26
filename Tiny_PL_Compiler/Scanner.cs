@@ -59,8 +59,6 @@ namespace TinyCompiler
             Operators.Add("-", Token_Class.MinusOp);
             Operators.Add("*", Token_Class.MultiplyOp);
             Operators.Add("/", Token_Class.DivideOp);
-            Operators.Add("||", Token_Class.OrOp);
-            Operators.Add("&&", Token_Class.AndOp);
         }
 
         public void StartScanning(string SourceCode)
@@ -70,11 +68,11 @@ namespace TinyCompiler
                 int j = i;
                 char CurrentChar = SourceCode[i];
                 string CurrentLexeme = CurrentChar.ToString();
-                //لو لاقيت مسافة او سطر جديد
-                if (CurrentChar == ' ' || CurrentChar == '\r' || CurrentChar == '\n')
+                //space or new line
+                if (CurrentChar == ' ' || CurrentChar == '\r' || CurrentChar == '\t' || CurrentChar == '\n')
                     continue;
 
-                //لو لاقيت كومنت
+                //comment case
                 else if (CurrentChar == '/')//لو لاقيت سلاش
                 {
                     bool is_comment = false;
@@ -110,9 +108,71 @@ namespace TinyCompiler
                         i = j;
                     }
                 }
+                else if (CurrentChar == '|' && SourceCode[i + 1] == '|')
+                {
+                    CurrentLexeme += SourceCode[i + 1];
+                    i += 1;
+                    Token_Class TC;
+                    Token Tok = new Token();
+                    Tok.lex = CurrentLexeme;
+                    TC = Token_Class.OrOp;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                }
+                //else if (CurrentChar == '.' )
+                //{
+                    
+                //}
+                else if ((CurrentChar =='<' && SourceCode[i + 1]=='=') || (CurrentChar == '>' && SourceCode[i + 1] == '='))
+                {
+                    CurrentLexeme += SourceCode[i + 1];
+                    i += 1;
+                    FindTokenClass(CurrentLexeme);
+                }
 
-                //لو لاقيت كلمة من حرف او اكتر
-                else if (CurrentChar >= 'A' && CurrentChar <= 'z') //if you read a character
+                else if (CurrentChar == '&' && SourceCode[i + 1] == '&')
+                {
+                    CurrentLexeme += SourceCode[i + 1];
+                    i += 1;
+                    Token_Class TC;
+                    Token Tok = new Token();
+                    Tok.lex = CurrentLexeme;
+                    TC = Token_Class.AndOp;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                }
+                else if (CurrentChar == '\"')
+                {
+                    j = i + 1;
+                    CurrentChar = SourceCode[j];
+                    while (CurrentChar!='\"')
+                    {
+                        CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
+                        j++;
+                        CurrentChar = SourceCode[j];
+                    }
+                    CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
+                    i = j + 1;
+                    Token_Class TC;
+                    Token Tok = new Token();
+                    Tok.lex = CurrentLexeme;
+                    TC = Token_Class.String;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                }
+                else if(CurrentChar==':')
+                {
+                    j = i + 1;
+                    CurrentChar = SourceCode[j];
+                    if(CurrentChar=='=')
+                    {
+                        CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
+                        FindTokenClass(CurrentLexeme);
+                    }
+                    i = j;
+                }
+                //if you read a character
+                else if (CurrentChar >= 'A' && CurrentChar <= 'z') 
                 {
                     j = i + 1;
                     if (j < SourceCode.Length)
@@ -129,15 +189,14 @@ namespace TinyCompiler
                     FindTokenClass(CurrentLexeme);
                     i = j - 1;
                 }
-
-                //لو لاقيت رقم من خانة واحدة او اكتر
-                else if (CurrentChar >= '0' && CurrentChar <= '9')
+                //if you read a number
+                else if (CurrentChar >= '0' && CurrentChar <= '9'|| CurrentChar == '.')
                 {
                     j = i + 1;
                     //CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                     CurrentChar = SourceCode[j];
 
-                    while ((CurrentChar >= '0' && CurrentChar <= '9') || CurrentChar.Equals('.'))
+                    while ((CurrentChar >= '0' && CurrentChar <= '9')|| (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
                     {
                         CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
 
@@ -213,7 +272,7 @@ namespace TinyCompiler
                 for (int i = 1; i < lex.Length; i++)
                 {
                     if (!(lex[i] >= 'A' && lex[i] <= 'z')
-                        || (lex[i] >= '0' && lex[i] <= '9'))
+                        && !(lex[i] >= '0' && lex[i] <= '9'))
                     {
                         isValid = false;
                     }

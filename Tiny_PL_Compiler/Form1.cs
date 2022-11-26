@@ -57,6 +57,7 @@ namespace TinyCompiler
         private void button2_Click(object sender, EventArgs e)
         {
             dataGridView1.Rows.Clear();
+            Errors.Error_List.Clear();
             ErrorListTextBox.Clear();
             Tiny_PL_compiler.TokenStream.Clear();
         }
