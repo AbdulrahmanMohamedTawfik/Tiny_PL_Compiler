@@ -108,28 +108,14 @@ namespace TinyCompiler
                         i = j;
                     }
                 }
-                else if (CurrentChar == '|' && SourceCode[i + 1] == '|')
-                {
-                    CurrentLexeme += SourceCode[i + 1];
-                    i += 1;
-                    Token_Class TC;
-                    Token Tok = new Token();
-                    Tok.lex = CurrentLexeme;
-                    TC = Token_Class.OrOp;
-                    Tok.token_type = TC;
-                    Tokens.Add(Tok);
-                }
-                //else if (CurrentChar == '.' )
-                //{
-                    
-                //}
-                else if ((CurrentChar =='<' && SourceCode[i + 1]=='=') || (CurrentChar == '>' && SourceCode[i + 1] == '='))
+                // >= and <= are not accepted
+                else if ((CurrentChar == '<' && SourceCode[i + 1] == '=') || (CurrentChar == '>' && SourceCode[i + 1] == '='))
                 {
                     CurrentLexeme += SourceCode[i + 1];
                     i += 1;
                     FindTokenClass(CurrentLexeme);
                 }
-
+                // AND operator
                 else if (CurrentChar == '&' && SourceCode[i + 1] == '&')
                 {
                     CurrentLexeme += SourceCode[i + 1];
@@ -141,11 +127,24 @@ namespace TinyCompiler
                     Tok.token_type = TC;
                     Tokens.Add(Tok);
                 }
+                // OR opeartor
+                else if (CurrentChar == '|' && SourceCode[i + 1] == '|')
+                {
+                    CurrentLexeme += SourceCode[i + 1];
+                    i += 1;
+                    Token_Class TC;
+                    Token Tok = new Token();
+                    Tok.lex = CurrentLexeme;
+                    TC = Token_Class.OrOp;
+                    Tok.token_type = TC;
+                    Tokens.Add(Tok);
+                }
+                //string case
                 else if (CurrentChar == '\"')
                 {
                     j = i + 1;
                     CurrentChar = SourceCode[j];
-                    while (CurrentChar!='\"')
+                    while (CurrentChar != '\"')
                     {
                         CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                         j++;
@@ -160,11 +159,11 @@ namespace TinyCompiler
                     Tok.token_type = TC;
                     Tokens.Add(Tok);
                 }
-                else if(CurrentChar==':')
+                else if (CurrentChar == ':')
                 {
                     j = i + 1;
                     CurrentChar = SourceCode[j];
-                    if(CurrentChar=='=')
+                    if (CurrentChar == '=')
                     {
                         CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                         FindTokenClass(CurrentLexeme);
@@ -172,7 +171,7 @@ namespace TinyCompiler
                     i = j;
                 }
                 //if you read a character
-                else if (CurrentChar >= 'A' && CurrentChar <= 'z') 
+                else if (CurrentChar >= 'A' && CurrentChar <= 'z')
                 {
                     j = i + 1;
                     if (j < SourceCode.Length)
@@ -190,13 +189,13 @@ namespace TinyCompiler
                     i = j - 1;
                 }
                 //if you read a number
-                else if (CurrentChar >= '0' && CurrentChar <= '9'|| CurrentChar == '.')
+                else if (CurrentChar >= '0' && CurrentChar <= '9' || CurrentChar == '.')
                 {
                     j = i + 1;
                     //CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                     CurrentChar = SourceCode[j];
 
-                    while ((CurrentChar >= '0' && CurrentChar <= '9')|| (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
+                    while ((CurrentChar >= '0' && CurrentChar <= '9') || (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
                     {
                         CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
 
@@ -208,7 +207,6 @@ namespace TinyCompiler
                     FindTokenClass(CurrentLexeme);
                     i = j - 1;
                 }
-
                 else
                 {
                     FindTokenClass(CurrentLexeme);
@@ -283,12 +281,31 @@ namespace TinyCompiler
         bool isConstant(string lex)
         {
             bool isValid = true;
-
-            for (int i = 0; i < lex.Length; i++)
+            //.0 and .000 are unrecognized tokens
+            if (lex[0] == '.')
             {
-                if (!((lex[i] >= '0' && lex[i] <= '9') || lex[i] == '.'))
+                for (int i = 1; i < lex.Length; i++)
                 {
-                    isValid = false;
+                    if (lex[i] == '0')
+                    {
+                        isValid = false;
+                        continue;
+                    }
+                    else
+                    {
+                        isValid = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < lex.Length; i++)
+                {
+                    if (!((lex[i] >= '0' && lex[i] <= '9') || lex[i] == '.'))
+                    {
+                        isValid = false;
+                    }
                 }
             }
             return isValid;
