@@ -192,7 +192,6 @@ namespace TinyCompiler
                 else if (CurrentChar >= '0' && CurrentChar <= '9' || CurrentChar == '.')
                 {
                     j = i + 1;
-                    //CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                     CurrentChar = SourceCode[j];
 
                     while ((CurrentChar >= '0' && CurrentChar <= '9') || (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
