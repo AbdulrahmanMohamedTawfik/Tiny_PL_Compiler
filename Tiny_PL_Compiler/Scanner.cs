@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 public enum Token_Class
 {
@@ -216,6 +217,8 @@ namespace TinyCompiler
         }
         void FindTokenClass(string Lex)
         {
+            //var rx_string = new Regex(@"[a - z | 0 - 9]+", RegexOptions.Compiled);
+
             Token_Class TC;
             Token Tok = new Token();
             Tok.lex = Lex;
@@ -226,14 +229,14 @@ namespace TinyCompiler
                 Tok.token_type = TC;
                 Tokens.Add(Tok);
             }
-            //Is it an identifier?
+            //Is it an Identifier?
             else if (isIdentifier(Lex))
             {
                 TC = Token_Class.Idenifier;
                 Tok.token_type = TC;
                 Tokens.Add(Tok);
             }
-
+            //Is it an Operator?
             else if (Operators.ContainsKey(Lex))
             {
                 TC = Operators[Lex];
@@ -248,8 +251,6 @@ namespace TinyCompiler
                 Tok.token_type = TC;
                 Tokens.Add(Tok);
             }
-            //Is it an operator?
-            //Is it an assign operator? (:=)
 
             else
             {
