@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 public enum Token_Class
 {
@@ -79,6 +80,7 @@ namespace TinyCompiler
                     bool is_comment = false;
                     //امشي خطوة
                     j++;
+
                     CurrentChar = SourceCode[j];
 
                     if (CurrentChar == '*')//لو لاقيت نجمة
@@ -103,6 +105,10 @@ namespace TinyCompiler
                             j++;
                             CurrentChar = SourceCode[j];
                         }
+                    }
+                    else
+                    {
+                        FindTokenClass(CurrentLexeme);
                     }
                     if (is_comment)
                     {
@@ -183,6 +189,8 @@ namespace TinyCompiler
                         {
                             CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
                             j++;
+                            if (j >= SourceCode.Length)
+                                break;
                             CurrentChar = SourceCode[j];
                         }
                     }
@@ -193,15 +201,22 @@ namespace TinyCompiler
                 else if (CurrentChar >= '0' && CurrentChar <= '9' || CurrentChar == '.')
                 {
                     j = i + 1;
-                    CurrentChar = SourceCode[j];
-
-                    while ((CurrentChar >= '0' && CurrentChar <= '9') || (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
+                    if (j < SourceCode.Length)
                     {
-                        CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
+                        CurrentChar = SourceCode[j];
 
-                        j++;
-                        if (j < SourceCode.Length)
-                            CurrentChar = SourceCode[j];
+                        while ((CurrentChar >= '0' && CurrentChar <= '9') || (CurrentChar >= 'A' && CurrentChar <= 'z') || CurrentChar.Equals('.'))
+                        {
+                            CurrentLexeme = CurrentLexeme + CurrentChar.ToString();
+
+                            j++;
+                            if (j >= SourceCode.Length)
+                                break;
+                            if (j < SourceCode.Length)
+
+                                CurrentChar = SourceCode[j];
+
+                        }
                     }
 
                     FindTokenClass(CurrentLexeme);
@@ -281,22 +296,16 @@ namespace TinyCompiler
         bool isConstant(string lex)
         {
             bool isValid = true;
+            //bool isdot = false;
+            //int i;
             //.0 and .000 are unrecognized tokens
             if (lex[0] == '.')
             {
-                for (int i = 1; i < lex.Length; i++)
-                {
-                    if (lex[i] == '0')
-                    {
-                        isValid = false;
-                        continue;
-                    }
-                    else
-                    {
-                        isValid = true;
-                        break;
-                    }
-                }
+                isValid = false;
+            }
+            else if (lex[lex.Length - 1] == '.')
+            {
+                isValid = false;
             }
             else
             {
