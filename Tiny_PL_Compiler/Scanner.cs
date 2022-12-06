@@ -81,17 +81,20 @@ namespace TinyCompiler
                 else if (CurrentChar == '/')//if you find '/'
                 {
                     //Console.WriteLine("you find '/'\n");
-                    bool is_comment = false;
+                    bool is_complete_comment = false;//opened and closed
+                    bool opened_comment = false;//only opened (not closed)
                     //start from char after '/'
                     j = i + 1;
                     if (j < SourceCode.Length)//if there is a char after '/'
                     {
                         //Console.WriteLine("there is a char after '/'\n");
-                        CurrentChar = SourceCode[j];
-                        CurrentLexeme += CurrentChar.ToString();
-                        if (CurrentChar == '*')//if there is '*' after '/'
+
+                        if (SourceCode[j] == '*')//if there is '*' after '/'
                         {
+                            CurrentChar = SourceCode[j];
+                            CurrentLexeme += CurrentChar.ToString();
                             //Console.WriteLine("there is '*' after '/'\n");
+                            opened_comment = true;
                             j++;
                             for (; j < SourceCode.Length; j++)
                             {
@@ -117,7 +120,7 @@ namespace TinyCompiler
                                         if (CurrentChar == '/')//if you found '/' ex)/*aaa*/
                                         {
                                             //Console.WriteLine("you found '/' ex)/*aaa*/\n");
-                                            is_comment = true;//يبقي ده كومنت
+                                            is_complete_comment = true;//يبقي ده كومنت
                                             break;
                                         }
                                         else//not '/'   ex)/*aaa*a
@@ -132,19 +135,26 @@ namespace TinyCompiler
                                 }
                             }
                         }
-                        else//there is no '*' after '/'   ex)'/a' 
+                        else//there is no '*' after '/'   ex)'/a' or '/4'
                         {
-                            FindTokenClass(CurrentLexeme);
+                            is_complete_comment = false;
+                            opened_comment = false;
                         }
                     }
-                    else// '/' at the end
-                        FindTokenClass(CurrentChar.ToString());
-                    if (is_comment)
+                    //else// '/' at the end
+                    //    FindTokenClass(CurrentChar.ToString());
+                    if (is_complete_comment)
                     {
+                        //Console.WriteLine("comment\n");
                         i = j + 1;
                     }
-                    else//not comment
+                    else if (opened_comment)
+                    {
+                        i = j + 1;
                         FindTokenClass(CurrentLexeme);
+                    }
+                    else
+                        FindTokenClass(CurrentChar.ToString());
                 }
 
                 //equal operator :=
