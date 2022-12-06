@@ -77,47 +77,76 @@ namespace TinyCompiler
                     continue;
 
                 //comment case
-                else if (CurrentChar == '/')//لو لاقيت سلاش
+                //    /*int x;
+                else if (CurrentChar == '/')//if you find '/'
                 {
+                    //Console.WriteLine("you find '/'\n");
                     bool is_comment = false;
-                    //امشي خطوة
+                    //start from char after '/'
                     j = i + 1;
-                    if (j < SourceCode.Length)
+                    if (j < SourceCode.Length)//if there is a char after '/'
                     {
+                        //Console.WriteLine("there is a char after '/'\n");
                         CurrentChar = SourceCode[j];
-                    }
-                    if (CurrentChar == '*')//لو لاقيت نجمة
-                    {
-                        //امشي خطوة تاني
-                        j++;
-                        CurrentChar = SourceCode[j];
-                        while (true)
+                        CurrentLexeme += CurrentChar.ToString();
+                        if (CurrentChar == '*')//if there is '*' after '/'
                         {
-                            if (CurrentChar == '*')//لو لاقيت نجمة
+                            //Console.WriteLine("there is '*' after '/'\n");
+                            j++;
+                            for (; j < SourceCode.Length; j++)
                             {
-                                //امشي خطوة
-                                j++;
+                                //Console.WriteLine("j= ");
+                                //Console.WriteLine(j);
+                                //Console.WriteLine("\n");
                                 CurrentChar = SourceCode[j];
-                                if (CurrentChar == '/')//لو لاقيت سلاش
+                                CurrentLexeme += CurrentChar.ToString();
+                                if (CurrentChar != '*')
                                 {
-                                    is_comment = true;//يبقي ده كومنت
-                                    break;
+                                    continue;
+                                }
+                                else//if you found '*' ex)/*aaa*
+                                {
+                                    //Console.WriteLine("you found '*' ex)/*aaa*\n");
+                                    //start from char after '*'
+                                    int x = j + 1;
+                                    if (x < SourceCode.Length)//if there is a char after '*'
+                                    {
+                                        //Console.WriteLine("there is a char after '*'\n");
+                                        CurrentChar = SourceCode[x];
+                                        CurrentLexeme += CurrentChar.ToString();
+                                        if (CurrentChar == '/')//if you found '/' ex)/*aaa*/
+                                        {
+                                            //Console.WriteLine("you found '/' ex)/*aaa*/\n");
+                                            is_comment = true;//يبقي ده كومنت
+                                            break;
+                                        }
+                                        else//not '/'   ex)/*aaa*a
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    else//'*' at the end   /*aaa*
+                                    {
+                                        FindTokenClass(CurrentLexeme);
+                                    }
                                 }
                             }
-                            //امشي خطوة
-                            j++;
-                            CurrentChar += SourceCode[j];
+                        }
+                        else//there is no '*' after '/'   ex)'/a' 
+                        {
+                            FindTokenClass(CurrentLexeme);
                         }
                     }
-                    else
-                    {
-                        FindTokenClass(CurrentLexeme);
-                    }
+                    else// '/' at the end
+                        FindTokenClass(CurrentChar.ToString());
                     if (is_comment)
                     {
-                        i = j;
+                        i = j + 1;
                     }
+                    else//not comment
+                        FindTokenClass(CurrentLexeme);
                 }
+
                 //equal operator :=
                 else if (CurrentChar == ':')
                 {
