@@ -216,7 +216,7 @@ namespace TinyCompiler
                         CurrentLexeme += SourceCode[j];
                     if (CurrentLexeme == ">=")
                     {
-                        Errors.Error_List.Add("Unidentified Token \'" + CurrentLexeme + "\'");
+                        Errors.Error_List.Add("Unidentified Token: (" + CurrentLexeme + ")");
                         i = j;
                     }
                     else
@@ -367,7 +367,7 @@ namespace TinyCompiler
 
             else
             {
-                Errors.Error_List.Add("Unidentified Token \'" + Lex + "\'");
+                Errors.Error_List.Add("Unidentified Token: (" + Lex + ")");
             }
 
         }

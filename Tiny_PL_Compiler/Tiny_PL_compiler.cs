@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JASON_Compiler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,11 @@ namespace TinyCompiler
     public static class Tiny_PL_compiler
     {
         public static Scanner Tiny_Scanner = new Scanner();
-       
-        public static List<string> Lexemes= new List<string>();
+        public static Parser Tiny_Parser = new Parser();
         public static List<Token> TokenStream = new List<Token>();
+        public static Node treeroot;
+        public static List<string> Lexemes= new List<string>();
+        //public static List<Token> TokenStream = new List<Token>();
 
 
         public static void Start_Compiling(string SourceCode) //character by character
@@ -20,6 +23,8 @@ namespace TinyCompiler
  
             Tiny_Scanner.StartScanning(SourceCode);
             //Parser
+            Tiny_Parser.StartParsing(TokenStream);
+            treeroot = Tiny_Parser.root;
             //Sematic Analysis
         } 
 

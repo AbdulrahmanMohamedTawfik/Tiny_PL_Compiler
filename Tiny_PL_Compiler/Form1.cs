@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JASON_Compiler;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,16 +20,18 @@ namespace TinyCompiler
 
         private void button1_Click(object sender, EventArgs e)
         {
+            //clear all before show new results
             dataGridView1.Rows.Clear();
             Errors.Error_List.Clear();
             ErrorListTextBox.Clear();
             Tiny_PL_compiler.TokenStream.Clear();
+            treeView1.Nodes.Clear();
             //string Code=textBox1.Text.ToLower();
             string Code = textBox1.Text;
             Tiny_PL_compiler.Start_Compiling(Code);
             PrintTokens();
-         //   PrintLexemes();
-
+            //PrintLexemes();
+            treeView1.Nodes.Add(Parser.PrintParseTree(Tiny_PL_compiler.treeroot));
             PrintErrors();
         }
         void PrintTokens()
@@ -63,6 +66,7 @@ namespace TinyCompiler
             Errors.Error_List.Clear();
             ErrorListTextBox.Clear();
             Tiny_PL_compiler.TokenStream.Clear();
+            treeView1.Nodes.Clear();
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
