@@ -32,38 +32,70 @@ namespace JASON_Compiler
             root.Children.Add(Program());
             return root;
         }
-        Node Program()
+        Node Program()//Program → Function
         {
             Node program = new Node("Program");
-            program.Children.Add(Header());
-            program.Children.Add(DeclSec());
-            program.Children.Add(Block());
-            //program.Children.Add(match(Token_Class.Semicolon));
-            //MessageBox.Show("Success");
+            program.Children.Add(Function());
             return program;
         }
+        Node Function()//Function → Fun_call Fun_Body 
+        {
 
-        Node Header()
-        {
-            Node header = new Node("Header");
-            // write your code here to check the header sructure
-            return header;
-        }
-        Node DeclSec()
-        {
-            Node declsec = new Node("DeclSec");
-            // write your code here to check atleast the declare sturcure 
-            // without adding procedures
-            return declsec;
-        }
-        Node Block()
-        {
-            Node block = new Node("block");
-            // write your code here to match statements
-            return block;
+            Node function = new Node("Function");
+            function.Children.Add(Function_Call());
+            function.Children.Add(Function_Body());
+            return function;
         }
 
-        // Implement your logic here
+        Node Function_Call()//Function_Call → Datatype FunctionName ( parameteres )
+        {
+            Node fun_call = new Node("Function Call");
+            fun_call.Children.Add(Datatype());
+            fun_call.Children.Add(FunctionName());
+            fun_call.Children.Add(match(Token_Class.LParanthesis));
+            //parameters separated by comma (,)
+            fun_call.Children.Add(match(Token_Class.RParanthesis));
+
+            return fun_call;
+        }
+
+        Node FunctionName()//FunctionName → identifier
+        {
+            Node fun_name = new Node("Function Name");
+            if (TokenStream[InputPointer].token_type == Token_Class.Idenifier)
+            {
+                fun_name.Children.Add(match(Token_Class.Idenifier));
+            }
+            return fun_name;
+        }
+
+        Node Datatype()//Datatype → int | float | string
+        {
+            Node data_type = new Node("Data Type");
+            if (TokenStream[InputPointer].token_type == Token_Class.Int)
+            {
+                data_type.Children.Add(match(Token_Class.Int));
+            }
+            else if (TokenStream[InputPointer].token_type == Token_Class.Float)
+            {
+                data_type.Children.Add(match(Token_Class.Float));
+            }
+            else if (TokenStream[InputPointer].token_type == Token_Class.String)
+            {
+                data_type.Children.Add(match(Token_Class.String));
+            }
+            return data_type;
+        }
+        Node Function_Body()//Function_Body → { statements return }
+        {
+            Node fun_body = new Node("Function Body");
+            fun_body.Children.Add(match(Token_Class.Lbrace));
+            //set of statements 
+            fun_body.Children.Add(match(Token_Class.Return));
+            fun_body.Children.Add(match(Token_Class.Rbrace));
+            return fun_body;
+        }
+ //_______________________________________________________________________________________________
 
         public Node match(Token_Class ExpectedToken)
         {
@@ -74,14 +106,12 @@ namespace JASON_Compiler
                 {
                     InputPointer++;
                     Node newNode = new Node(ExpectedToken.ToString());
-
                     return newNode;
-
                 }
 
                 else
                 {
-                    Errors.Error_List.Add("Parsing Error: Expected " + ExpectedToken.ToString() + " and " +TokenStream[InputPointer].token_type.ToString() + "  found\r\n");
+                    Errors.Error_List.Add("Parsing Error: Expected " + ExpectedToken.ToString() + " and " + TokenStream[InputPointer].token_type.ToString() + "  found\r\n");
                     InputPointer++;
                     return null;
                 }
