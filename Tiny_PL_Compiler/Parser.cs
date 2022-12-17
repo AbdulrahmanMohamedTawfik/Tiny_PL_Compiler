@@ -23,85 +23,117 @@ namespace JASON_Compiler
         int InputPointer = 0;
         List<Token> TokenStream;
         public Node root;
-
+        /*
+        -----
+        Note:
+        -----
+        Lbrace → {
+        Rbrace → }
+        LParanthesis → (
+        RParanthesis → )
+        */
         public Node StartParsing(List<Token> TokenStream)
         {
             this.InputPointer = 0;
             this.TokenStream = TokenStream;
-            root = new Node("Program");
-            root.Children.Add(Program());
+            root = new Node("Program");//1.	Program → Functions MainFunction
+            //root.Children.Add(Functions());
+            root.Children.Add(MainFunction());
             return root;
         }
-        Node Program()//Program → Function
-        {
-            Node program = new Node("Program");
-            program.Children.Add(Function());
-            return program;
-        }
-        Node Function()//Function → Fun_call Fun_Body 
-        {
 
-            Node function = new Node("Function");
-            function.Children.Add(Function_Call());
-            function.Children.Add(Function_Body());
+        Node MainFunction()//2.	MainFunction → int Main () FunBody
+        {
+            Node mainfunction = new Node("MainFunction");
+            mainfunction.Children.Add(match(Token_Class.Int));
+            mainfunction.Children.Add(match(Token_Class.Main));
+            mainfunction.Children.Add(match(Token_Class.LParanthesis));
+            mainfunction.Children.Add(match(Token_Class.RParanthesis));
+            mainfunction.Children.Add(Function_Body());
+
+            return mainfunction;
+        }
+
+        Node Functions()
+        {
+            //3.Functions → Functions Function | Function | ε
+            //  1.Functions → Function Funcs
+            //  2.Funcs → Function Functions | ε
+
+            Node function = new Node("Functions");
+
+            function.Children.Add(Function());
+            function.Children.Add(Funcs());
             return function;
         }
 
-        Node Function_Call()//Function_Call → Datatype FunctionName ( parameteres )
+        Node Funcs()//  2.Funcs → Function Functions | ε
         {
-            Node fun_call = new Node("Function Call");
-            fun_call.Children.Add(Datatype());
-            fun_call.Children.Add(FunctionName());
-            fun_call.Children.Add(match(Token_Class.LParanthesis));
-            //parameters separated by comma (,)
-            fun_call.Children.Add(match(Token_Class.RParanthesis));
-
-            return fun_call;
+            Node funcs = new Node("Funcs");
+            funcs.Children.Add(Function());
+            funcs.Children.Add(Functions());
+            return funcs;
         }
 
-        Node FunctionName()//FunctionName → identifier
+        Node Function()//4.	Function → FunDeclaration FunBody
         {
-            Node fun_name = new Node("Function Name");
-            if (TokenStream[InputPointer].token_type == Token_Class.Idenifier)
-            {
-                fun_name.Children.Add(match(Token_Class.Idenifier));
-            }
-            return fun_name;
+            Node function = new Node("Function");
+
+            return function;
         }
 
-        Node Datatype()//Datatype → int | float | string
+
+        Node Function_Body()//10.	FunBody → { Statements ReturnStatement ; }
         {
-            Node data_type = new Node("Data Type");
-            if (TokenStream[InputPointer].token_type == Token_Class.Int)
-            {
-                data_type.Children.Add(match(Token_Class.Int));
-            }
-            else if (TokenStream[InputPointer].token_type == Token_Class.Float)
-            {
-                data_type.Children.Add(match(Token_Class.Float));
-            }
-            else if (TokenStream[InputPointer].token_type == Token_Class.String)
-            {
-                data_type.Children.Add(match(Token_Class.String));
-            }
-            return data_type;
-        }
-        Node Function_Body()//Function_Body → { statements return }
-        {
-            Node fun_body = new Node("Function Body");
+            //10.	FunBody → { [ReturnStatement ; | ε] }
+            Node fun_body = new Node("Functions Body");
+
             fun_body.Children.Add(match(Token_Class.Lbrace));
-            //set of statements 
-            fun_body.Children.Add(match(Token_Class.Return));
-            fun_body.Children.Add(match(Token_Class.Rbrace));
+            // fun_body.Children.Add(Statements());
+            if (TokenStream[InputPointer].token_type == Token_Class.Rbrace)
+            {
+                fun_body.Children.Add(match(Token_Class.Rbrace));
+            }
+            else
+            {
+                fun_body.Children.Add(match(Token_Class.Return));
+                fun_body.Children.Add(match(Token_Class.Semicolon));
+                fun_body.Children.Add(match(Token_Class.Rbrace));
+            }
+            //fun_body.Children.Add(match(Token_Class.Rbrace));
             return fun_body;
         }
- //_______________________________________________________________________________________________
+        //Node Function()
+        //{
+
+        //}
+
+        //Node Datatype()//Datatype → int | float | string
+        //{
+        //    Node data_type = new Node("Data Type");
+        //    if (TokenStream[InputPointer].token_type == Token_Class.Int)
+        //    {
+        //        data_type.Children.Add(match(Token_Class.Int));
+        //    }
+        //    else if (TokenStream[InputPointer].token_type == Token_Class.Float)
+        //    {
+        //        data_type.Children.Add(match(Token_Class.Float));
+        //    }
+        //    else if (TokenStream[InputPointer].token_type == Token_Class.String)
+        //    {
+        //        data_type.Children.Add(match(Token_Class.String));
+        //    }
+        //    return data_type;
+        //}
+
+        //_______________________________________________________________________________________________
 
         public Node match(Token_Class ExpectedToken)
         {
-
+            //if there is more tokens i will continue else i will raise an error
             if (InputPointer < TokenStream.Count)
             {
+                //if the token is as i expected(the passed parameter) then i will add it to tree else i will raise an error
                 if (ExpectedToken == TokenStream[InputPointer].token_type)
                 {
                     InputPointer++;

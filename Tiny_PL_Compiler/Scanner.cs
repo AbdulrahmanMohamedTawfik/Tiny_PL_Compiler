@@ -10,7 +10,7 @@ public enum Token_Class
 {
     Int, Float, String, Read, Write, Repeat, Until, If, Elseif, Else, Then, End, Return,
     Endl, Parameters, Semicolon, Comma, LParanthesis, RParanthesis, Lbrace, Rbrace, IsEqualOp, EqualOp, LessThanOp,
-    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp, Idenifier, Constant
+    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp, Idenifier, Constant, Main
 }
 namespace TinyCompiler
 {
@@ -45,6 +45,7 @@ namespace TinyCompiler
             ReservedWords.Add("return", Token_Class.Return);
             ReservedWords.Add("endl", Token_Class.Endl);
             ReservedWords.Add("parameters", Token_Class.Parameters);
+            ReservedWords.Add("Main", Token_Class.Main);
 
             Operators.Add(";", Token_Class.Semicolon);
             Operators.Add(",", Token_Class.Comma);
@@ -340,6 +341,12 @@ namespace TinyCompiler
                 Tok.token_type = TC;
                 Tokens.Add(Tok);
             }
+            else if (Lex == "main")
+            {
+                TC = Token_Class.Main;
+                Tok.token_type = TC;
+                Tokens.Add(Tok);
+            }
             //Is it an Identifier?
             else if (isIdentifier(Lex))
             {
@@ -377,7 +384,10 @@ namespace TinyCompiler
             bool isValid = true;
             if (!(lex[0] >= 'A' && lex[0] <= 'z'))
             { isValid = false; }
-
+            else if (lex == "main")
+            {
+                isValid = false;
+            }
             else
             {
                 for (int i = 1; i < lex.Length; i++)

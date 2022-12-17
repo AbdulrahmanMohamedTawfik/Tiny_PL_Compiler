@@ -9,7 +9,7 @@ namespace TinyCompiler
     static class Program
     {
         /// <summary>
-        /// The main entry point for the application.
+        /// The Main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
