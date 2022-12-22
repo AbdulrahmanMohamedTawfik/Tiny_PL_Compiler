@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -88,21 +89,23 @@ namespace JASON_Compiler
             //10.	FunBody → { [ReturnStatement ; | ε] }
             Node fun_body = new Node("Functions Body");
 
-            fun_body.Children.Add(match(Token_Class.Lbrace));
+            fun_body.Children.Add(match(Token_Class.Lbrace));//{
             // fun_body.Children.Add(Statements());
-            if (TokenStream[InputPointer].token_type == Token_Class.Rbrace)
-            {
-                fun_body.Children.Add(match(Token_Class.Rbrace));
-            }
-            else
-            {
-                fun_body.Children.Add(match(Token_Class.Return));
-                fun_body.Children.Add(match(Token_Class.Semicolon));
-                fun_body.Children.Add(match(Token_Class.Rbrace));
-            }
+            fun_body.Children.Add(ReturnSt());
+            fun_body.Children.Add(match(Token_Class.Semicolon));
+            fun_body.Children.Add(match(Token_Class.Rbrace));//}
             //fun_body.Children.Add(match(Token_Class.Rbrace));
             return fun_body;
         }
+
+        Node ReturnSt()//21.	ReturnSt → return Expression
+        {
+            Node return_st = new Node("Return Statement");
+            return_st.Children.Add(match(Token_Class.Return));
+            //return_st.Children.Add(Expression());
+            return return_st;
+        }
+
         //Node Function()
         //{
 
