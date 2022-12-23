@@ -153,21 +153,26 @@ namespace JASON_Compiler
 
         private Node Statements()
         {
-            //11.Statements → Statements Statement | Statement
+            //11.Statements → Statements ; Statement | Statement
             //    1.Statements → Statement State
-            //    2.State →  Statement State | ε
+            //    2.State → ; Statement State | ε
             Node node = new Node("Statements");
             node.Children.Add(Statement());
             node.Children.Add(State());
             return node;
         }
 
-        private Node State()//    2.State →  Statement State | ε
+        private Node State()//    2.State → ; Statement State | ε
         {
             Node node = new Node("State");
-            node.Children.Add(Statement());
-            node.Children.Add(State());
-            return node;
+            if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
+            {
+                node.Children.Add(match(Token_Class.Semicolon));
+                node.Children.Add(Statement());
+                node.Children.Add(State());
+                return node;
+            }
+            return null;
         }
 
         private Node Statement()//12.	Statement → AssignmentSt | DeclarationStatement | WriteSt | ReadSt | ReturnSt | IfStatement | Repeat | FunctionCall | ε
@@ -178,8 +183,8 @@ namespace JASON_Compiler
             node.Children.Add(WriteSt());
             node.Children.Add(ReadSt());
             node.Children.Add(ReturnSt());
-            node.Children.Add(IfStatement());
-            node.Children.Add(Repeat());
+            node.Children.Add(IfStatement());//no ;
+            node.Children.Add(Repeat());//no ;
             node.Children.Add(FunctionCall());
             return node;
         }
@@ -192,12 +197,12 @@ namespace JASON_Compiler
             Console.WriteLine("7");
             return_st.Children.Add(match(Token_Class.Return));
             return_st.Children.Add(Expressions());
-            if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
-            {
-                return_st.Children.Add(match(Token_Class.Semicolon));
-            }
-            else
-                Errors.Error_List.Add("Expected ';'");
+            //if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
+            //{
+            //    return_st.Children.Add(match(Token_Class.Semicolon));
+            //}
+            //else
+            //    Errors.Error_List.Add("Expected ';'");
             return return_st;
         }
 
@@ -327,7 +332,7 @@ namespace JASON_Compiler
             return data_type;
         }
 
-        Node Repeat()
+        Node Repeat()//30.	Repeat → repeat Statements until ConditionSt
         {
             Node repeat_declare = new Node("Repeat ");
             repeat_declare.Children.Add(match(Token_Class.Repeat));
@@ -337,7 +342,7 @@ namespace JASON_Compiler
             return repeat_declare;
         }
 
-        Node FunctionCall()
+        Node FunctionCall()//31.	FunctionCall → FunName ArgList
         {
             Node FunctionCall_declare = new Node("FunctionCall ");
             FunctionCall_declare.Children.Add(FunName());
@@ -346,7 +351,7 @@ namespace JASON_Compiler
             return FunctionCall_declare;
         }
 
-        Node ArgList()
+        Node ArgList()//32.	ArgList → ( Arguments) | ε
         {
             Node ArgList_declare = new Node("ArgList ");
 
@@ -355,9 +360,8 @@ namespace JASON_Compiler
                 ArgList_declare.Children.Add(match(Token_Class.LParanthesis));
                 ArgList_declare.Children.Add(Arguments());
                 ArgList_declare.Children.Add(match(Token_Class.RParanthesis));
-                ArgList_declare.Children.Add(match(Token_Class.Semicolon));
+                //ArgList_declare.Children.Add(match(Token_Class.Semicolon));
                 return ArgList_declare;
-
             }
             else
             {
@@ -368,6 +372,10 @@ namespace JASON_Compiler
 
         Node Arguments()
         {
+            //33.Arguments → Arguments , identifier | identifier
+            //    1.Arguments → identifier Arg
+            //    2.Arg → , identifier Arg | ε
+
             Node Arguments_declare = new Node("Arguments ");
             Arguments_declare.Children.Add(match(Token_Class.Idenifier));
             Arguments_declare.Children.Add(Arg());
@@ -375,7 +383,7 @@ namespace JASON_Compiler
             return Arguments_declare;
         }
 
-        Node Arg()
+        Node Arg()//2.Arg → , identifier Arg | ε
         {
             Node Arg_declare = new Node("Arg");
             int temp = InputPointer;
@@ -387,19 +395,17 @@ namespace JASON_Compiler
                 {
                     Arg_declare.Children.Add(Arg());
                 }
-
             }
             else
             {
                 return null;
             }
-
             return Arg_declare;
         }
 
         //****************************************************************
 
-        Node ConditionSt()//1.	ConditionSt → Condition ConditionSt_1   
+        Node ConditionSt()//1.	ConditionSt → Condition ConditionSt_ 
         {
             Node conditionSt = new Node("ConditionSt");
             conditionSt.Children.Add(Condition());
@@ -413,7 +419,7 @@ namespace JASON_Compiler
             conditionSt_1.Children.Add(Conditions());
             return conditionSt_1;
         }
-        Node Conditions()   //	Conditions  → BoolOp Condition Conditions_1
+        Node Conditions()   //	Conditions  → BoolOp Condition Conditions_
         {
             Node conditions = new Node("Conditions");
             conditions.Children.Add(BoolOp());
@@ -421,13 +427,13 @@ namespace JASON_Compiler
             conditions.Children.Add(Conditions_());
             return conditions;
         }
-        Node Conditions_()//2.	Conditions_1  → Conditions | ε   
+        Node Conditions_()//2.	Conditions_  → Conditions | ε   
         {
             Node conditions_1 = new Node("Conditions_1");
             conditions_1.Children.Add(Conditions());
             return conditions_1;
         }
-        Node Condition()
+        Node Condition()//25.	Condition → identifier ConditionOp  Term
         {
             Node condition = new Node("Condition");
             condition.Children.Add(match(Token_Class.Idenifier));
@@ -530,15 +536,6 @@ namespace JASON_Compiler
 
         }
         //****************************************************************
-        Node statement()
-        {
-            Node node = new Node("statement");
-            node.Children.Add(AssignmentSt());
-            node.Children.Add(DeclarationSt());
-            node.Children.Add(WriteSt());
-            node.Children.Add(ReadSt());
-            return node;
-        }
 
         private Node ReadSt()
         {
@@ -546,7 +543,7 @@ namespace JASON_Compiler
             Node node = new Node("ReadSt");
             node.Children.Add(match(Token_Class.Read));
             node.Children.Add(match((Token_Class.Idenifier)));
-            node.Children.Add(match((Token_Class.Semicolon)));
+            //node.Children.Add(match((Token_Class.Semicolon)));
             return node;
         }
 
@@ -562,7 +559,7 @@ namespace JASON_Compiler
             }
             else
                 node.Children.Add(Expressions());
-            node.Children.Add(match(Token_Class.Semicolon));
+            //node.Children.Add(match(Token_Class.Semicolon));
             return node;
         }
 
@@ -571,7 +568,7 @@ namespace JASON_Compiler
             Node node = new Node("Declaration Statement");
             node.Children.Add(Datatype());
             node.Children.Add(DeclarationSt());
-            node.Children.Add(match(Token_Class.Semicolon));
+            //node.Children.Add(match(Token_Class.Semicolon));
             return node;
         }
 
@@ -644,7 +641,7 @@ namespace JASON_Compiler
                         node.Children.Add(match(Token_Class.Idenifier));
                         node.Children.Add(match(Token_Class.EqualOp));
                         node.Children.Add(Expressions());
-                        node.Children.Add(match(Token_Class.Semicolon));
+                        //node.Children.Add(match(Token_Class.Semicolon));
                         return node;
                     }
                 }
@@ -652,6 +649,7 @@ namespace JASON_Compiler
             return null;
 
         }
+
         //_______________________________________________________________________________________________
 
         public Node match(Token_Class ExpectedToken)
