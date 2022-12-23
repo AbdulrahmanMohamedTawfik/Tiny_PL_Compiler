@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -37,9 +38,30 @@ namespace JASON_Compiler
         {
             this.InputPointer = 0;
             this.TokenStream = TokenStream;
-            root = new Node("Program");//1.	Program → Functions MainFunction
-            //root.Children.Add(Functions());
-            root.Children.Add(MainFunction());
+            bool is_main = false;
+            root = new Node("Program");//1.	Program → Functions MainFunction | MainFunction
+            if ((TokenStream[InputPointer].token_type == Token_Class.Int) || (TokenStream[InputPointer].token_type == Token_Class.Float) || (TokenStream[InputPointer].token_type == Token_Class.String))
+            {
+                int tmp = InputPointer + 1;
+                if (tmp < TokenStream.Count)
+                {
+                    if (TokenStream[tmp].token_type == Token_Class.Main)
+                    {
+                        is_main = true;
+                        Console.WriteLine("is main");
+                    }
+                }
+            }
+            if (is_main)
+            {
+                root.Children.Add(MainFunction());
+            }
+            else
+            {
+                Console.WriteLine("is not main");
+                //root.Children.Add(Functions());//not completed
+                root.Children.Add(MainFunction());
+            }
             return root;
         }
 
@@ -50,7 +72,7 @@ namespace JASON_Compiler
             mainfunction.Children.Add(match(Token_Class.Main));
             mainfunction.Children.Add(match(Token_Class.LParanthesis));
             mainfunction.Children.Add(match(Token_Class.RParanthesis));
-            mainfunction.Children.Add(Function_Body());
+            //mainfunction.Children.Add(Function_Body());
 
             return mainfunction;
         }
@@ -79,31 +101,103 @@ namespace JASON_Compiler
         Node Function()//4.	Function → FunDeclaration FunBody
         {
             Node function = new Node("Function");
-
+            function.Children.Add(FunDeclaration());
+            function.Children.Add(Function_Body());
             return function;
         }
 
-
-        Node Function_Body()//10.	FunBody → { Statements ReturnStatement ; }
+        Node FunDeclaration()//5. FunDeclaration → DataType FunName Parameter
         {
-            //10.	FunBody → { [ReturnStatement ; | ε] }
-            Node fun_body = new Node("Functions Body");
+            Node fun_declare = new Node("Function Declaration");
+            fun_declare.Children.Add(Datatype());
+            fun_declare.Children.Add(FunName());
+            //fun_declare.Children.Add(Parameter());
+            return fun_declare;
+        }
+        Node FunName()//7.	FunName → identifier
+        {
+            Node fun_declare = new Node("Function Declaration");
+            fun_declare.Children.Add(match(Token_Class.Idenifier));
+            return fun_declare;
+        }
+
+        Node Function_Body()//10.	FunBody → { Statements ReturnStatement }
+        {
+            Node fun_body = new Node("Function Body");
 
             fun_body.Children.Add(match(Token_Class.Lbrace));//{
             // fun_body.Children.Add(Statements());
             fun_body.Children.Add(ReturnSt());
-            fun_body.Children.Add(match(Token_Class.Semicolon));
+            
             fun_body.Children.Add(match(Token_Class.Rbrace));//}
             //fun_body.Children.Add(match(Token_Class.Rbrace));
             return fun_body;
         }
 
-        Node ReturnSt()//21.	ReturnSt → return Expression
+        Node ReturnSt()//21.	ReturnSt → return Expression ;
         {
             Node return_st = new Node("Return Statement");
             return_st.Children.Add(match(Token_Class.Return));
-            //return_st.Children.Add(Expression());
+            return_st.Children.Add(Expressions());
+            return_st.Children.Add(match(Token_Class.Semicolon));
             return return_st;
+        }
+
+        Node Expressions()
+        {
+            //14.Expressions → Expressions Operators Term | Term
+                //1.Expressions → Term Exp
+                //2.Exp → Operators Term Exp | ε
+            Node expression = new Node("Expression");
+            expression.Children.Add(Term());
+            return expression;
+        }
+
+        Node Term()
+        {
+            //16.Term  → Term Operators Factor | Factor
+                //1.Term → Factor Ter
+                //2.Ter → Operators Factor Ter | ε
+
+            Node term = new Node("Term");
+            term.Children.Add(Factor());
+            term.Children.Add(Ter());
+
+            return term;
+        }
+
+        Node Ter()//2.Ter → Operators Factor Ter | ε
+        {
+            Node ter = new Node("Ter");
+            ter.Children.Add(Operators());
+            ter.Children.Add(Factor());
+            ter.Children.Add(Ter());
+
+            return ter;
+        }
+
+        Node Operators()//15.	Operators → + | - | * | /
+        {
+            Node op = new Node("Operators");
+            //op.Children.Add();
+            return op;
+        }
+
+        Node Factor()//17.	Factor → identifier | constant
+        {
+            Node factor = new Node("Factor");
+            //factor.Children.Add();
+            return factor;
+        }
+
+        Node Exp()//2.Exp → Operators Term Exp | ε
+        {
+
+            Node exp = new Node("Exp");
+            exp.Children.Add(Term());
+            exp.Children.Add(Exp());
+
+            return exp;
         }
 
         //Node Function()
@@ -111,23 +205,23 @@ namespace JASON_Compiler
 
         //}
 
-        //Node Datatype()//Datatype → int | float | string
-        //{
-        //    Node data_type = new Node("Data Type");
-        //    if (TokenStream[InputPointer].token_type == Token_Class.Int)
-        //    {
-        //        data_type.Children.Add(match(Token_Class.Int));
-        //    }
-        //    else if (TokenStream[InputPointer].token_type == Token_Class.Float)
-        //    {
-        //        data_type.Children.Add(match(Token_Class.Float));
-        //    }
-        //    else if (TokenStream[InputPointer].token_type == Token_Class.String)
-        //    {
-        //        data_type.Children.Add(match(Token_Class.String));
-        //    }
-        //    return data_type;
-        //}
+        Node Datatype()//Datatype → int | float | string
+        {
+            Node data_type = new Node("Data Type");
+            if (TokenStream[InputPointer].token_type == Token_Class.Int)
+            {
+                data_type.Children.Add(match(Token_Class.Int));
+            }
+            else if (TokenStream[InputPointer].token_type == Token_Class.Float)
+            {
+                data_type.Children.Add(match(Token_Class.Float));
+            }
+            else if (TokenStream[InputPointer].token_type == Token_Class.String)
+            {
+                data_type.Children.Add(match(Token_Class.String));
+            }
+            return data_type;
+        }
 
         //_______________________________________________________________________________________________
 
