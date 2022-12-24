@@ -211,15 +211,20 @@ namespace JASON_Compiler
 
         Node Expressions()
         {
-            //14.Expression → Expression AddOp Term | Term
+            //14.Expression → Expression AddOp Term | Term | string
             //1.Expression → Term Exp
             //2.Exp → AddOp Term Exp | ε
 
             Node expression = new Node("Expression");
             if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
             {
-                Errors.Error_List.Add("Returned value Not Found");
+                Errors.Error_List.Add("Expression value Not Found");
                 return null;
+            }
+            if (TokenStream[InputPointer].token_type == Token_Class.String)
+            {
+                expression.Children.Add(match(Token_Class.String));
+                return expression;
             }
             expression.Children.Add(Term());
             expression.Children.Add(Exp());
