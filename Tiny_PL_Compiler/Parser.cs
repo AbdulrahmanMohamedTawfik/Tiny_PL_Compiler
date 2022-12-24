@@ -463,10 +463,12 @@ namespace JASON_Compiler
             {
                 conditionOp.Children.Add(match(Token_Class.LessThanOp));
             }
-            else
+            else if (TokenStream[InputPointer].token_type == Token_Class.GreaterThanOp)
             {
                 conditionOp.Children.Add(match(Token_Class.GreaterThanOp));
             }
+            else
+                Errors.Error_List.Add("Invalid Conditional Operator (it should be '<', '>', '=' or '<>')");
 
             return conditionOp;
         }
