@@ -116,16 +116,8 @@ namespace JASON_Compiler
             Node fun_declare = new Node("Function Declaration");
             Console.WriteLine("3");
             fun_declare.Children.Add(Datatype());
-            fun_declare.Children.Add(FunName());
+            fun_declare.Children.Add(match(Token_Class.Idenifier));//function name
             //fun_declare.Children.Add(Parameter());
-            return fun_declare;
-        }
-
-        Node FunName()//7.	FunName → identifier
-        {
-            Node fun_declare = new Node("Function Declaration");
-            Console.WriteLine("5");
-            fun_declare.Children.Add(match(Token_Class.Idenifier));
             return fun_declare;
         }
         Node Funcs()//  2.Funcs → Function Functions | ε
@@ -140,10 +132,8 @@ namespace JASON_Compiler
             Node fun_body = new Node("Function Body");
             Console.WriteLine("6");
             fun_body.Children.Add(match(Token_Class.Lbrace));//{
-            fun_body.Children.Add(Statements());
 
-            //fun_body.Children.Add(AssignmentSt());
-            //fun_body.Children.Add(FunctionCall());
+            fun_body.Children.Add(Statements());
 
             fun_body.Children.Add(ReturnSt());
 
@@ -177,15 +167,29 @@ namespace JASON_Compiler
 
         private Node Statement()//12.	Statement → AssignmentSt | DeclarationStatement | WriteSt | ReadSt | ReturnSt | IfStatement | Repeat | FunctionCall | ε
         {
-            Node node = new Node("Statements");
+            Node node = new Node("Statement");
+            //while(InputPointer<TokenStream.Count)
+            //if (TokenStream[InputPointer].token_type == Token_Class.Idenifier)//starts with identifier
+            //{
             node.Children.Add(AssignmentSt());
-            node.Children.Add(DeclarationStatement());
-            node.Children.Add(WriteSt());
-            node.Children.Add(ReadSt());
-            node.Children.Add(ReturnSt());
-            node.Children.Add(IfStatement());//no ;
-            node.Children.Add(Repeat());//no ;
+
             node.Children.Add(FunctionCall());
+            //if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
+            //{
+            //    node.Children.Add(match(Token_Class.Semicolon));
+            //}
+
+            node.Children.Add(DeclarationStatement());
+
+            node.Children.Add(WriteSt());
+
+            node.Children.Add(ReadSt());
+
+            node.Children.Add(ReturnSt());
+
+            //node.Children.Add(IfStatement());//no ;
+            //node.Children.Add(Repeat());//no ;
+
             return node;
         }
 
@@ -194,16 +198,15 @@ namespace JASON_Compiler
             //return    return;     return 2
 
             Node return_st = new Node("Return Statement");
-            Console.WriteLine("7");
-            return_st.Children.Add(match(Token_Class.Return));
-            return_st.Children.Add(Expressions());
-            //if (TokenStream[InputPointer].token_type == Token_Class.Semicolon)
-            //{
-            //    return_st.Children.Add(match(Token_Class.Semicolon));
-            //}
-            //else
-            //    Errors.Error_List.Add("Expected ';'");
-            return return_st;
+            if (TokenStream[InputPointer].token_type == Token_Class.Return)
+            {
+                Console.WriteLine("7");
+                return_st.Children.Add(match(Token_Class.Return));
+                return_st.Children.Add(Expressions());
+                
+                return return_st;
+            }
+            return null;
         }
 
         Node Expressions()
@@ -335,20 +338,28 @@ namespace JASON_Compiler
         Node Repeat()//30.	Repeat → repeat Statements until ConditionSt
         {
             Node repeat_declare = new Node("Repeat ");
-            repeat_declare.Children.Add(match(Token_Class.Repeat));
-            //  repeat_declare.Children.Add(Statments());
-            repeat_declare.Children.Add(match(Token_Class.Until));
-            // repeat_declare.Children.Add(ConditionSt());
-            return repeat_declare;
+            if (TokenStream[InputPointer].token_type == Token_Class.Repeat)
+            {
+                repeat_declare.Children.Add(match(Token_Class.Repeat));
+                repeat_declare.Children.Add(Statements());
+                repeat_declare.Children.Add(match(Token_Class.Until));
+                repeat_declare.Children.Add(ConditionSt());
+                return repeat_declare;
+            }
+            return null;
         }
 
-        Node FunctionCall()//31.	FunctionCall → FunName ArgList
+        Node FunctionCall()//31.	FunctionCall → identifier ArgList
         {
             Node FunctionCall_declare = new Node("FunctionCall ");
-            FunctionCall_declare.Children.Add(FunName());
-            FunctionCall_declare.Children.Add(ArgList());
+            if (TokenStream[InputPointer].token_type == Token_Class.Idenifier)
+            {
+                FunctionCall_declare.Children.Add(match(Token_Class.Idenifier));//function name
+                FunctionCall_declare.Children.Add(ArgList());
 
-            return FunctionCall_declare;
+                return FunctionCall_declare;
+            }
+            return null;
         }
 
         Node ArgList()//32.	ArgList → ( Arguments) | ε
@@ -407,33 +418,29 @@ namespace JASON_Compiler
 
         Node ConditionSt()//1.	ConditionSt → Condition ConditionSt_ 
         {
+            //21.ConditionSt → Condition BoolOp ConditionSt | Condition
+            //    1.ConditionSt → Condition ConditionSt_
+            //    2.ConditionSt_ → BoolOp ConditionSt | ε
+
+
             Node conditionSt = new Node("ConditionSt");
             conditionSt.Children.Add(Condition());
-
-            //conditionSt.Children.Add(ConditionSt_());
+            conditionSt.Children.Add(ConditionSt_());
             return conditionSt;
         }
-        Node ConditionSt_()//2.	Conditions_  → Conditions | ε
+        Node ConditionSt_()//    2.ConditionSt_ → BoolOp ConditionSt | ε
         {
-            Node conditionSt_1 = new Node("ConditionSt_");
-            conditionSt_1.Children.Add(Conditions());
-            return conditionSt_1;
+            Node conditionSt_ = new Node("ConditionSt_");
+            if ((TokenStream[InputPointer].token_type == Token_Class.AndOp) || (TokenStream[InputPointer].token_type == Token_Class.OrOp))
+            {
+                conditionSt_.Children.Add(BoolOp());
+                conditionSt_.Children.Add(ConditionSt());
+                return conditionSt_;
+            }
+            return null;
         }
-        Node Conditions()   //	Conditions  → BoolOp Condition Conditions_
-        {
-            Node conditions = new Node("Conditions");
-            conditions.Children.Add(BoolOp());
-            conditions.Children.Add(Condition());
-            conditions.Children.Add(Conditions_());
-            return conditions;
-        }
-        Node Conditions_()//2.	Conditions_  → Conditions | ε   
-        {
-            Node conditions_1 = new Node("Conditions_1");
-            conditions_1.Children.Add(Conditions());
-            return conditions_1;
-        }
-        Node Condition()//25.	Condition → identifier ConditionOp  Term
+
+        Node Condition()//25.	Condition → identifier ConditionOp Term
         {
             Node condition = new Node("Condition");
             condition.Children.Add(match(Token_Class.Idenifier));
@@ -480,22 +487,26 @@ namespace JASON_Compiler
         Node IfStatement() //27.	IfStatement → if ConditionSt then Statements ElseIfStatement  ElseStatement end
         {
             Node ifStatement = new Node("IfStatement");
-            ifStatement.Children.Add(match(Token_Class.If));
-            ifStatement.Children.Add(ConditionSt());
-            ifStatement.Children.Add(match(Token_Class.Then));
-            //ifStatement.Children.Add(Statements());
-            ifStatement.Children.Add(ElseIfStatement());
-            ifStatement.Children.Add(ElseStatement());
-            if (TokenStream[InputPointer].token_type == Token_Class.End)
+            if (TokenStream[InputPointer].token_type == Token_Class.If)
             {
+                ifStatement.Children.Add(match(Token_Class.If));
+                ifStatement.Children.Add(ConditionSt());
+                ifStatement.Children.Add(match(Token_Class.Then));
+                ifStatement.Children.Add(Statements());
+                ifStatement.Children.Add(ElseIfStatement());
+                ifStatement.Children.Add(ElseStatement());
+                //if (TokenStream[InputPointer].token_type == Token_Class.End)
+
                 ifStatement.Children.Add(match(Token_Class.End));
+
+                //else
+                //{
+                //    Errors.Error_List.Add("End not found");
+                //    return null;
+                //}
+                return ifStatement;
             }
-            else
-            {
-                Errors.Error_List.Add("End not found");
-                return null;
-            }
-            return ifStatement;
+            return null;
 
         }
         Node ElseStatement() //29.	ElseStatement → else Statements end
@@ -506,7 +517,7 @@ namespace JASON_Compiler
                 return null;
             }
             elseStatement.Children.Add(match(Token_Class.Else));
-            //elseStatement.Children.Add(Statements());
+            elseStatement.Children.Add(Statements());
 
             //elseStatement.Children.Add(match(Token_Class.End));
             return elseStatement;
@@ -522,7 +533,7 @@ namespace JASON_Compiler
             elseIfStatement.Children.Add(match(Token_Class.Elseif));
             elseIfStatement.Children.Add(ConditionSt());
             elseIfStatement.Children.Add(match(Token_Class.Then));
-            //IfStatement.Children.Add(Statements());
+            elseIfStatement.Children.Add(Statements());
             if (TokenStream[InputPointer].token_type == Token_Class.Elseif)
             {
                 elseIfStatement.Children.Add(ElseIfStatement());
@@ -541,10 +552,14 @@ namespace JASON_Compiler
         {
             //ReadSt → read identifier
             Node node = new Node("ReadSt");
-            node.Children.Add(match(Token_Class.Read));
-            node.Children.Add(match((Token_Class.Idenifier)));
-            //node.Children.Add(match((Token_Class.Semicolon)));
-            return node;
+            if (TokenStream[InputPointer].token_type == Token_Class.Read)
+            {
+                node.Children.Add(match(Token_Class.Read));
+                node.Children.Add(match((Token_Class.Idenifier)));
+                //node.Children.Add(match((Token_Class.Semicolon)));
+                return node;
+            }
+            return null;
         }
 
         private Node WriteSt()
@@ -552,24 +567,32 @@ namespace JASON_Compiler
             //WriteSt → write Expression endl
             //WriteSt → write [endl | Expression] ;
             Node node = new Node("WriteSt");
-            node.Children.Add(match(Token_Class.Write));
-            if (TokenStream[InputPointer].token_type == Token_Class.Endl)
+            if (TokenStream[InputPointer].token_type == Token_Class.Write)
             {
-                node.Children.Add(match(Token_Class.Endl));
+                node.Children.Add(match(Token_Class.Write));
+                if (TokenStream[InputPointer].token_type == Token_Class.Endl)
+                {
+                    node.Children.Add(match(Token_Class.Endl));
+                }
+                else
+                    node.Children.Add(Expressions());
+                //node.Children.Add(match(Token_Class.Semicolon));
+                return node;
             }
-            else
-                node.Children.Add(Expressions());
-            //node.Children.Add(match(Token_Class.Semicolon));
-            return node;
+            return null;
         }
 
         private Node DeclarationStatement()//19.	DeclarationStatement → DataType DeclarationSt ;
         {
             Node node = new Node("Declaration Statement");
-            node.Children.Add(Datatype());
-            node.Children.Add(DeclarationSt());
-            //node.Children.Add(match(Token_Class.Semicolon));
-            return node;
+            if((TokenStream[InputPointer].token_type == Token_Class.Int)|| (TokenStream[InputPointer].token_type == Token_Class.Float)|| (TokenStream[InputPointer].token_type == Token_Class.String))
+            {
+                node.Children.Add(Datatype());
+                node.Children.Add(DeclarationSt());
+                //node.Children.Add(match(Token_Class.Semicolon));
+                return node;
+            }
+            return null;
         }
 
         private Node DeclarationSt()
