@@ -8,9 +8,10 @@ using System.Globalization;
 
 public enum Token_Class
 {
-    Int, Float, String, Read, Write, Repeat, Until, If, Elseif, Else, Then, End, Return,
-    Endl, Parameters, Semicolon, Comma, LParanthesis, RParanthesis, Lbrace, Rbrace, IsEqualOp, EqualOp, LessThanOp,
-    GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp, Idenifier, Constant, Main
+    Int_Token, Float_Token, String_Token, Read_Token, Write_Token, Repeat_Token, Until_Token, If_Token, Elseif_Token, 
+    Else_Token, Then_Token, End_Token, Return_Token, Endl_Token, Parameters_Token, Semicolon, Comma, LParanthesis, RParanthesis, 
+    Lbrace, Rbrace, IsEqualOp, EqualOp, LessThanOp, GreaterThanOp, NotEqualOp, PlusOp, MinusOp, MultiplyOp, DivideOp, AndOp, OrOp, 
+    Idenifier, Constant, Main
 }
 namespace TinyCompiler
 {
@@ -30,21 +31,21 @@ namespace TinyCompiler
 
         public Scanner()
         {
-            ReservedWords.Add("int", Token_Class.Int);
-            ReservedWords.Add("float", Token_Class.Float);
-            ReservedWords.Add("string", Token_Class.String);
-            ReservedWords.Add("read", Token_Class.Read);
-            ReservedWords.Add("write", Token_Class.Write);
-            ReservedWords.Add("repeat", Token_Class.Repeat);
-            ReservedWords.Add("until", Token_Class.Until);
-            ReservedWords.Add("if", Token_Class.If);
-            ReservedWords.Add("else", Token_Class.Else);
-            ReservedWords.Add("elseif", Token_Class.Elseif);
-            ReservedWords.Add("then", Token_Class.Then);
-            ReservedWords.Add("end", Token_Class.End);
-            ReservedWords.Add("return", Token_Class.Return);
-            ReservedWords.Add("endl", Token_Class.Endl);
-            ReservedWords.Add("parameters", Token_Class.Parameters);
+            ReservedWords.Add("int", Token_Class.Int_Token);
+            ReservedWords.Add("float", Token_Class.Float_Token);
+            ReservedWords.Add("string", Token_Class.String_Token);
+            ReservedWords.Add("read", Token_Class.Read_Token);
+            ReservedWords.Add("write", Token_Class.Write_Token);
+            ReservedWords.Add("repeat", Token_Class.Repeat_Token);
+            ReservedWords.Add("until", Token_Class.Until_Token);
+            ReservedWords.Add("if", Token_Class.If_Token);
+            ReservedWords.Add("else", Token_Class.Else_Token);
+            ReservedWords.Add("elseif", Token_Class.Elseif_Token);
+            ReservedWords.Add("then", Token_Class.Then_Token);
+            ReservedWords.Add("end", Token_Class.End_Token);
+            ReservedWords.Add("return", Token_Class.Return_Token);
+            ReservedWords.Add("endl", Token_Class.Endl_Token);
+            ReservedWords.Add("parameters", Token_Class.Parameters_Token);
             ReservedWords.Add("Main", Token_Class.Main);
 
             Operators.Add(";", Token_Class.Semicolon);
@@ -330,7 +331,7 @@ namespace TinyCompiler
             //is it a string?
             if (Lex[0] == '"' && Lex[Lex.Length - 1] == '"')
             {
-                TC = Token_Class.String;
+                TC = Token_Class.String_Token;
                 Tok.token_type = TC;
                 Tokens.Add(Tok);
             }
